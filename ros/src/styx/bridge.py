@@ -187,4 +187,5 @@ class Bridge(object):
         self.server('throttle', data={'throttle': str(data.pedal_cmd)})
 
     def callback_brake(self, data):
+        rospy.loginfo( '[Server.send] brake = %.2f', data.pedal_cmd )
         self.server('brake', data={'brake': str(data.pedal_cmd)})

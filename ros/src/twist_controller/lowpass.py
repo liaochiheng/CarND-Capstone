@@ -15,6 +15,6 @@ class LowPassFilter(object):
             val = self.a * val + self.b * self.last_val
         else:
             self.ready = True
-
+        
         self.last_val = val
         return val
