@@ -74,7 +74,6 @@ class WaypointUpdater(object):
         lane.header.stamp = rospy.Time(0)
 
         # self.traffic_wp = -1
-        # TODO: Stop at "traffic_wp - 30"!!!
         if self.traffic_wp == -1:
             if near_i + LOOKAHEAD_WPS > num_wps:
                 lane.waypoints = self.base_wps.waypoints[ near_i : ] + \
@@ -136,13 +135,23 @@ class WaypointUpdater(object):
     def set_waypoint_velocity(self, waypoints, waypoint, velocity):
         waypoints[waypoint].twist.twist.linear.x = velocity
 
-    def distance(self, waypoints, wp1, wp2):
+    def _distance(self, waypoints, wp1, wp2):
         dist = 0
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
         for i in range(wp1, wp2+1):
             dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
             wp1 = i
         return dist
+
+    def distance(self, waypoints, wp1, wp2):
+        num = len( waypoints )
+        wp1, wp2 = wp1 % num, wp2 % num
+        if wp2 > wp1:
+            return self._distance( waypoints, wp1, wp2 )
+        else:
+            num_wps = len( self.base_wps.waypoints )
+            return self._distance( waypoints, wp1, num_wps - 1 ) + \
+                    self._distance( waypoints, 0, wp2 )
 
     def accelerate( self, waypoints, near_i ):
         for wp in waypoints:

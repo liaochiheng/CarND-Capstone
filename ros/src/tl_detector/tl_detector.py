@@ -15,6 +15,9 @@ import math
 STATE_COUNT_THRESHOLD = 3
 LIGHT_AHEAD_WPS = 200
 
+# The car should stop ahead red light about 27.m
+STOP_AHEAD_DIST = 27.
+
 class TLDetector(object):
     def __init__(self):
         rospy.init_node('tl_detector')
@@ -172,25 +175,16 @@ class TLDetector(object):
         light_wps = []
         for light in self.lights:
             p = light.pose.pose.position
-            wp = self.get_closest_waypoint( p.x, p.y, p.z ) - 30
-            if wp < 0:
-                wp += num_wps
+            wp = self.get_closest_waypoint( p.x, p.y, p.z )
+            # Find real stop location of light
+            wp = self.get_stop_waypoint( wp )
+
             light_wps.append( wp )
 
         # find upcoming light
         light_wp = -1
         state = TrafficLight.UNKNOWN
         
-        # Find if close enough to one light
-        # for i, wp in enumerate( light_wps ):
-        #     if abs( wp - car_wp ) <= 5 \
-        #         or abs( wp - car_wp + num_wps ) <= 5 \
-        #         or abs( wp - car_wp - num_wps ) <= 5:
-        #         light_wp = wp
-        #         state = self.lights[ i ].state
-        #         light_dist = 0
-        #         break
-        # else:
         light_dist = num_wps * 2
         for i, wp in enumerate( light_wps ):
             dist = wp - car_wp if wp > car_wp else wp + num_wps - car_wp
@@ -199,15 +193,56 @@ class TLDetector(object):
                 state = self.lights[ i ].state
                 light_dist = dist
 
+        ss = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
+        rospy.loginfo( '[tl_detector] upcoming: %d - %d = %d, dist = %.2f, state = %s', \
+            light_wp, car_wp, light_dist, \
+            self.distance( self.base_wps.waypoints, car_wp, light_wp ), ss[ state ] )
+
         if light_dist > LIGHT_AHEAD_WPS:
             light_wp = -1
             state = TrafficLight.UNKNOWN
         #else:
-        ss = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
-        rospy.loginfo( '[tl_detector] upcoming: %d - %d = %d, state = %s', \
-            light_wp, car_wp, light_dist, ss[ state ] )
+        # ss = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
+        # rospy.loginfo( '[tl_detector] upcoming: %d - %d = %d, state = %s', \
+        #     light_wp, car_wp, light_dist, ss[ state ] )
 
         return light_wp, state
+
+    # Find the real stop waypoint of 'light_wp', which should locate ahead about 27m
+    def get_stop_waypoint( self, light_wp ):
+        waypoints = self.base_wps.waypoints
+        num_wps = len( waypoints )
+        wp1_last, wp1 = light_wp, light_wp
+        dist_last, dist = 0, 0
+
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
+        
+        while dist < STOP_AHEAD_DIST:
+            wp0 = wp1 - 1 if wp1 >= 1 else num_wps - 1
+            dist_last = dist
+            dist += dl( waypoints[ wp0 ].pose.pose.position, waypoints[ wp1 ].pose.pose.position )
+            wp1_last = wp1
+            wp1 = wp0
+
+        return wp1 if dist - STOP_AHEAD_DIST < STOP_AHEAD_DIST - dist_last else wp1_last
+
+    def _distance(self, waypoints, wp1, wp2):
+        dist = 0
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
+        for i in range(wp1, wp2+1):
+            dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
+            wp1 = i
+        return dist
+
+    def distance(self, waypoints, wp1, wp2):
+        num = len( waypoints )
+        wp1, wp2 = wp1 % num, wp2 % num
+        if wp2 > wp1:
+            return self._distance( waypoints, wp1, wp2 )
+        else:
+            num_wps = len( self.base_wps.waypoints )
+            return self._distance( waypoints, wp1, num_wps - 1 ) + \
+                    self._distance( waypoints, 0, wp2 )
 
     def find_upcoming_light( self, car_wp ):
         # Calc waypoint index for lights from config, calc only once
