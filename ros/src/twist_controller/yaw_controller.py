@@ -1,4 +1,4 @@
-from math import atan
+from math import atan, asin
 import rospy
 
 class YawController(object):
@@ -13,7 +13,8 @@ class YawController(object):
 
 
     def get_angle(self, radius):
-        angle = atan(self.wheel_base / radius) * self.steer_ratio
+        # angle = atan(self.wheel_base / radius) * self.steer_ratio
+        angle = asin(self.wheel_base / radius) * self.steer_ratio
         return max(self.min_angle, min(self.max_angle, angle))
 
     def get_steering(self, linear_velocity, angular_velocity, current_velocity):

@@ -124,7 +124,7 @@ class TLDetector(object):
 
         return wpi
 
-    def get_light_state(self, light):
+    def get_light_state( self ):
         """Determines the current color of the traffic light
 
         Args:
@@ -164,9 +164,9 @@ class TLDetector(object):
         #TODO find the closest visible traffic light (if one exists)
         # light_wp = find_upcoming_light( car_wp )
         # if light_wp != -1:
-        #     state = self.get_light_state(light)
+        #     state = self.get_light_state()
         #     return light_wp, state
-        # # self.waypoints = None
+        
         # return -1, TrafficLight.UNKNOWN
 
     def find_upcoming_light_test( self, car_wp ):
@@ -193,10 +193,10 @@ class TLDetector(object):
                 state = self.lights[ i ].state
                 light_dist = dist
 
-        ss = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
-        rospy.loginfo( '[tl_detector] upcoming: %d - %d = %d, dist = %.2f, state = %s', \
-            light_wp, car_wp, light_dist, \
-            self.distance( self.base_wps.waypoints, car_wp, light_wp ), ss[ state ] )
+        # ss = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
+        # rospy.loginfo( '[tl_detector] upcoming: %d - %d = %d, dist = %.2f, state = %s', \
+        #     light_wp, car_wp, light_dist, \
+        #     self.distance( self.base_wps.waypoints, car_wp, light_wp ), ss[ state ] )
 
         if light_dist > LIGHT_AHEAD_WPS:
             light_wp = -1
@@ -251,7 +251,10 @@ class TLDetector(object):
             stop_line_positions = self.config['stop_line_positions']
             self.light_wps = []
             for p in stop_line_positions:
-                self.light_wps.append( self.get_closest_waypoint( p[ 0 ], p[ 1 ], 0. ) )
+                wp = self.get_closest_waypoint( p[ 0 ], p[ 1 ], 0. )
+                # Find real stop location of light
+                wp = self.get_stop_waypoint( wp )
+                self.light_wps.append( wp )
             self.light_wps.sort()
 
         # find upcoming light
@@ -264,7 +267,7 @@ class TLDetector(object):
                 break
         else:
             light_wp = self.light_wps[ 0 ]
-            light_dist = light_wp + len( self.base_wps ) - car_wp
+            light_dist = light_wp + len( self.base_wps.waypoints ) - car_wp
 
         return light_wp if light_dist <= LIGHT_AHEAD_WPS else -1
 
