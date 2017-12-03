@@ -3,6 +3,8 @@
 build
 devel
 bags
+datasets
+ssd-mobile
 
 profile.tmp
 

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="tl_detector" type="tl_collector.py" name="tl_collector" output="screen">
+    	<param name="collect_path" value="$(find tl_detector)../../../datasets/" />
+	</node>
+</launch>

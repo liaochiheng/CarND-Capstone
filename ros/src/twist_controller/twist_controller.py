@@ -90,8 +90,8 @@ class Controller(object):
 
         steer = self.yaw_controller.get_steering( proposed_linear_v, proposed_angular_v, current_linear_v )
     
-    	if True:
-        	rospy.loginfo( "[twist_controller] throttle = %.2f, brake = %.2f, steer = %.2f", \
-    			throttle, brake, steer )
+    	# if True:
+     #    	rospy.loginfo( "[twist_controller] throttle = %.2f, brake = %.2f, steer = %.2f", \
+    	# 		throttle, brake, steer )
 
         return throttle, brake, steer
