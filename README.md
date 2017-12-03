@@ -3,6 +3,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 ### Team and Members
 * Team name: Rocky
 * Team members
+
  |               | Name         | Account Email                |
  | ------------- | ------------ | ---------------------------- |
  | Team Leader   | Chiheng Liao | liaochiheng@vip.163.com      |
@@ -22,11 +23,11 @@ It's a great project and also a great challenge. Here is an introduction of all 
 2. twister_controller node
 	* Since the twiddle parameters for PID is kind of impossible, so we simply use a constant throttle and brake. That works fine in simulator.
 	* For throttle, type is PERCENT. We use 1.0 for simulator and 0.025 for Carla retrieved from a rosbag(udacity_succesful_light_detection.bag).
-	* For brake, type is TORQUE. It's calculated by
+	* For brake, type is TORQUE. It's calculated by  
 	```
 	self.max_brake_value = ( self.vehicle_mass + self.fuel_capacity * GAS_DENSITY ) \
     				* decel * self.wheel_radius
-    ```
+    ```  
     * For steer, we simply used the yaw_controller, nothing changed.
 
 3. tl_detector node
@@ -48,8 +49,8 @@ It's a great project and also a great challenge. Here is an introduction of all 
 	
 ### Acknowledgement
 
-Thanks for all our team members, we made a great achievement.
-Thanks a lot to our classmate Vatsal Srivastava, [Self Driving Vehicles: Traffic Light Detection and Classification with TensorFlow Object Detection API](https://becominghuman.ai/traffic-light-detection-tensorflow-api-c75fdbadac62) give me a lot of help.
+Thanks for all our team members, we made a great achievement.  
+Thanks a lot to our classmate Vatsal Srivastava, [Self Driving Vehicles: Traffic Light Detection and Classification with TensorFlow Object Detection API](https://becominghuman.ai/traffic-light-detection-tensorflow-api-c75fdbadac62) give me a lot of help.  
 Also thanks to many classmates from slack and udacity-team, you gave me a lot of help.
 
 ### Native Installation
