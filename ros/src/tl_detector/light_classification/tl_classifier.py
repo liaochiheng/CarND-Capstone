@@ -61,10 +61,8 @@ class TLClassifier(object):
         elapse = time.time() - time_start
         rospy.loginfo( '[tl_classifier] Detection time: %.0fms', elapse * 1000 )
         
-        clz = ['GREEN', 'RED', 'YELLOW', 'UNKNOWN']
         rospy.loginfo( '[tl_classifier] classes: %s', classes )
         rospy.loginfo( '[tl_classifier] scores: %s', scores )
-        rospy.loginfo( '[tl_classifier] class: %s, score = %.2f', clz[ classes[ 0 ] - 1 ], scores[ 0 ] )
 
         if test:
             return boxes, scores, classes, num
@@ -84,6 +82,9 @@ class TLClassifier(object):
                 c = 4
         else:
             c = 4
+
+        tx = ['-', 'GREEN', 'RED', 'YELLOW', 'UNKNOWN']
+        rospy.loginfo( '[tl_classifier] class: %s', tx[ c ] )
 
         if c == 1:
             return TrafficLight.GREEN

@@ -52,7 +52,7 @@ class Controller(object):
 
         dv = math.fabs( current_linear_v - proposed_linear_v )
 
-        log = False
+        log = True
 
         if proposed_linear_v > 0 and current_linear_v > 0 and dv < 0.05: # Reach proposed velocity
         	throttle = 0.
