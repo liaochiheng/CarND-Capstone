@@ -59,10 +59,13 @@ class TLClassifier(object):
         classes = np.squeeze(classes).astype(np.int32)
 
         elapse = time.time() - time_start
-        rospy.loginfo( '[tl_classifier] Detection time: %.0fms', elapse * 1000 )
+        # rospy.loginfo( '[tl_classifier] Detection time: %.0fms', elapse * 1000 )
         
-        rospy.loginfo( '[tl_classifier] classes: %s', classes )
-        rospy.loginfo( '[tl_classifier] scores: %s', scores )
+        # rospy.loginfo( '[tl_classifier] classes: %s', classes )
+        # rospy.loginfo( '[tl_classifier] scores: %s', scores )
+
+        # tx = ['-', 'GREEN', 'RED', 'YELLOW', 'UNKNOWN']
+        # rospy.loginfo( '[tl_classifier] light: %s, score: %.2f', tx[ classes[0] ], scores[0] )
 
         if test:
             return boxes, scores, classes, num

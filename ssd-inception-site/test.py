@@ -2,6 +2,7 @@ import tensorflow as tf
 import cv2
 from PIL import Image
 import numpy as np
+import sys
 
 model_path = 'frozen_inference_graph.pb'
 
@@ -48,5 +49,5 @@ def detect( images ):
             print('===============================')
 
 if __name__ == '__main__':
-    images = [ '../test_images/site_{:0>4d}.png'.format( i ) for i in range( 21, 27 ) ]
+    images = sys.argv[ 1: ]
     detect( images )

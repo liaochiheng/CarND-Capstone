@@ -46,7 +46,7 @@ class WaypointUpdater(object):
         self.traffic_wp = -1
         self.velocity = 0
 
-        v = rospy.get_param('/waypoint_loader/velocity', 40. )
+        v = rospy.get_param('/waypoint_loader/velocity', 20. )
         self.vel_max = ( v * 1000. ) / ( 60. * 60. )
 
         rospy.spin()
