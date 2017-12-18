@@ -7,6 +7,7 @@ from cv_bridge import CvBridge
 from light_classification.tl_classifier import TLClassifier
 import cv2
 import math
+import os
 
 import numpy as np
 # from PIL import Image
@@ -28,6 +29,9 @@ class TLTest(object):
 
         self.bridge = CvBridge()
 
+        self.collect_count = 0
+        self.collect_path = rospy.get_param('~collect_path')
+
         rospy.spin()
 
     def image_cb(self, msg):
@@ -37,7 +41,30 @@ class TLTest(object):
         boxes, scores, classes, num = \
             self.light_classifier.get_classification( cv_image, test = True )
 
+        self.print_info( scores, classes, num )
+
         self.pub_detection( cv_image, boxes, scores, classes )
+
+    def print_info( self, scores, classes, num ):
+        if num > 0:
+            claz = []
+            for i in range( num ):
+                if scores[ i ] >= 0.3:
+                    claz.append( classes[ i ] )
+
+            if len( claz ) > 0:
+                c = max( claz, key = claz.count )
+            else:
+                c = 4
+            c1 = classes[ 0 ]
+            score1 = scores[ 0 ]
+        else:
+            c = 4
+            c1 = 4
+            score1 = 0
+
+        tx = ['-', 'GREEN', 'RED', 'YELLOW', 'UNKNOWN']
+        rospy.loginfo( '[tl_test] class: %s, [%s: %.2f]', tx[ c ], tx[ c1 ], score1 )
 
     def filter_boxes(self, min_score, boxes, scores, classes):
         """Return boxes with a confidence >= `min_score`"""
@@ -96,7 +123,7 @@ class TLTest(object):
 
 
     def pub_detection( self, image, boxes, scores, classes ):
-        confidence_cutoff = 0.5
+        confidence_cutoff = 0.3
         # Filter boxes with a confidence score less than `confidence_cutoff`
         boxes, scores, classes = self.filter_boxes(confidence_cutoff, boxes, scores, classes)
 
@@ -108,9 +135,14 @@ class TLTest(object):
         # Each class with be represented by a differently colored box
         self.draw_boxes(image, box_coords, classes)
 
+        # self.save_image( image )
+
         self.detection_pubs.publish( self.bridge.cv2_to_imgmsg( image, "rgb8" ) )
 
-
+    def save_image( self, image ):
+        file = os.path.join( self.collect_path, 'site_{:0>4d}.png'.format( self.collect_count ) )
+        self.collect_count += 1
+        cv2.imwrite( file, cv2.cvtColor( image, cv2.COLOR_RGB2BGR ) )
 
 if __name__ == '__main__':
     TLTest()

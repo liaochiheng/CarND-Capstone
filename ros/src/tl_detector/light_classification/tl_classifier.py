@@ -59,7 +59,7 @@ class TLClassifier(object):
         classes = np.squeeze(classes).astype(np.int32)
 
         elapse = time.time() - time_start
-        # rospy.loginfo( '[tl_classifier] Detection time: %.0fms', elapse * 1000 )
+        rospy.loginfo( '[tl_classifier] Detection time: %.0fms', elapse * 1000 )
         
         # rospy.loginfo( '[tl_classifier] classes: %s', classes )
         # rospy.loginfo( '[tl_classifier] scores: %s', scores )
@@ -76,7 +76,7 @@ class TLClassifier(object):
         if num > 0:
             claz = []
             for i in range( num ):
-                if scores[ i ] >= 0.5:
+                if scores[ i ] >= 0.3:
                     claz.append( classes[ i ] )
 
             if len( claz ) > 0:

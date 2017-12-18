@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <launch>
-	<node pkg="rosbag" type="play" name="rosbag" args="$(find styx)../../../bags/review_1207/890699_2017-12-05-14-32-32.bag" required="true"/>
+	<node pkg="rosbag" type="play" name="rosbag" args="$(find styx)../../../bags/2017-12-14.bag" required="true"/>
 
 	<node pkg="tl_detector" type="tl_test.py" name="tl_test" output="screen" cwd="node">
 		<param name="model_path" value="$(find tl_detector)../../../ssd-inception-site-sun/frozen_inference_graph.pb" />
+		<param name="collect_path" value="$(find tl_detector)../../../datasets/" />
 	</node>
 </launch>
